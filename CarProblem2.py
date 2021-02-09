@@ -1,4 +1,5 @@
 import random
+import json
 
 grid_dims=(10, 10)
 
@@ -17,7 +18,8 @@ class Passenger:
     average_unhappiness = 0
     average_time_elapsed = 0
 
-    def __init__(self, id):
+    def __init__(self, name, id):
+        self.name = name
         self.id = id
         self.start = (0, 0)
         self.end = (0, 0)
@@ -40,6 +42,12 @@ class Passenger:
 
     def is_picked_up(self):
         return self.time_since_pickup is not None
+
+    def get_letter(self):
+        if self.is_picked_up():
+            return chr(ord('a') + self.id)
+        else:
+            return chr(ord('A') + self.id)
 
     # Ideal time is the best-case scenario for the car to come to the passenger and deliver them to their destination.
     # It's computed at the moment the passenger first summons the car. It assumes that the car goes by the most
@@ -106,17 +114,21 @@ class Passenger:
         return self.end if self.is_picked_up() else self.start
 
     @staticmethod
-    def make_passenger(id):
-        passenger = Passenger(id)
+    def make_passenger(name):
+        id = len(Passenger.passenger_roster)
+        passenger = Passenger(name, id)
         Passenger.passenger_roster.append(passenger)
 
     @staticmethod
     def activate_passenger(start, end, car_pt, id):
-        passenger = Passenger(id)
+        if id < 0 or id >= len(Passenger.passenger_roster): return
+        name = Passenger.passenger_roster[id].name
+        passenger = Passenger(name, id)
         passenger.activate(start, end)
         passenger.compute_ideal_time(car_pt)
         Passenger.active_passengers.append(passenger)
         Passenger.active_passengers_dict[id] = passenger
+        return passenger
 
     @staticmethod
     def is_passenger_active(id):
@@ -194,6 +206,8 @@ class Car:
 
 class System:
 
+    json_source_objects = []
+
     def __int__(self):
         pass
 
@@ -213,14 +227,13 @@ class System:
                 grid[pos[1]][pos[0]] = _str
 
         for passenger in Passenger.active_passengers:
-            start_let = chr(ord('A') + passenger.id)
-            end_let = chr(ord('a') + passenger.id)
+            let = passenger.get_letter()
             start = passenger.start
             end = passenger.end
             if not passenger.is_picked_up():
-                _add_letter(start, start_let)
+                _add_letter(start, let)
             else:
-                _add_letter(end, end_let)
+                _add_letter(end, let)
 
         _add_letter(Car.car.pos, '*')
 
@@ -236,20 +249,31 @@ class System:
             print(row_str)
 
         for passenger in Passenger.active_passengers:
-            let = chr(ord('A') + passenger.id)
+            let = passenger.get_letter()
             print("Passenger {}: unhappiness prediction {:.2f}, system unhappiness {:.2f}".format(let, passenger.predict_unhappiness_score(Car.car.pos), passenger.system_unhappiness_score))
 
     @staticmethod
     def setup():
         car = Car()
-        for i in range(10):
-            Passenger.make_passenger(id)
+        names = ["Aloysius", "Betty", "Crispin", "Dumbledore", "Eunice", "Flavius", "Georgia", "Hildebrand", "Ivanka", "Jebediah"]
+        for name in names:
+            Passenger.make_passenger(name)
+
+    @staticmethod
+    def add_json_entries(passenger_list):
+        requests = []
+        for p in passenger_list:
+            the_dict = {'name': p.name, 'start': p.start, 'end': p.end}
+            requests.append(the_dict)
+        x = {'requests': requests}
+        System.json_source_objects.append(x)
 
     @staticmethod
     def activate_new_passengers():
         car = Car.car
         need_reorder = False
-        for id in range(10):
+        newly_active_list = []
+        for id in range(len(Passenger.passenger_roster)):
             if Passenger.active_passengers_dict.get(id) is None:
                 # This passenger has a one in twenty-five chance of wanting a ride
                 r = random.randrange(25)
@@ -257,8 +281,10 @@ class System:
                     start_pos = (random.randrange(grid_dims[0]), random.randrange(grid_dims[1]))
                     end_pos = (random.randrange(grid_dims[0]), random.randrange(grid_dims[1]))
                     if start_pos != end_pos:
-                        Passenger.activate_passenger(start_pos, end_pos, car.pos, id)
+                        passenger = Passenger.activate_passenger(start_pos, end_pos, car.pos, id)
+                        newly_active_list.append(passenger)
                         need_reorder = True
+        System.add_json_entries(newly_active_list)
         if need_reorder:
             Passenger.reorder(Car.car.pos)
 
@@ -283,3 +309,6 @@ while(True):
 
 print("Average unhappiness: {:.3f}".format(Passenger.average_unhappiness))
 print("Average trip time: {:.3f}".format(Passenger.average_time_elapsed))
+print()
+y = json.dumps(System.json_source_objects, indent=4)
+print(y)
