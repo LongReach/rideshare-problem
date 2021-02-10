@@ -4,7 +4,7 @@ namespace RideShare {
 
 	Dispatcher::Dispatcher() {
 		_last_request_made = false;
-		_first_update_made = false;
+		_new_request_made = false;
 		_next_passenger = NULL;
 	}
 
@@ -43,9 +43,9 @@ namespace RideShare {
 		}
 		_active_passengers = new_passenger_list;
 
-		if (!_first_update_made) {
+		if (_new_request_made) {
 			change_occurred = true;
-			_first_update_made = true;
+			_new_request_made = false;
 		}
 
 		// If a change happened in the system (drop-off, pick-up, new ride request), recalculate a new immediate goal
@@ -134,6 +134,7 @@ namespace RideShare {
 		passenger->compute_ideal_times(_car._pos);
 		_active_passengers.push_back(passenger);
 		_active_passenger_map[data->_id] = passenger;
+		_new_request_made = true;
 	}
 
 	Passenger* Dispatcher::get_active_passenger(int id) {

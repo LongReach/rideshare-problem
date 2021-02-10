@@ -5,24 +5,10 @@
 #include "Point.h"
 #include "Passenger.h"
 #include "Dispatcher.h"
+#include "RideShareTester.h"
 
 using namespace std;
 using namespace RideShare;
-
-string get_passenger_list_str(vector<PassengerData*>& the_list, const char *if_empty_str) {
-    string out_str = "";
-    if (the_list.size() == 0 && if_empty_str) {
-        out_str = if_empty_str;
-        return out_str;
-    }
-
-    string comma_str = "";
-    for (vector<PassengerData*>::iterator it = the_list.begin(); it != the_list.end(); it++) {
-        out_str = out_str + comma_str + (*it)->get_name();
-        comma_str = ", ";
-    }
-    return out_str;
-}
 
 int main()
 {
@@ -37,6 +23,7 @@ int main()
     passenger.activate(start, end);
 #endif
 
+#if 0
     Dispatcher dispatcher;
 
     std::cout << "Launching Dispatcher!\n";
@@ -68,5 +55,26 @@ int main()
 
         t++;
     }
+
+    json j2 = {
+      {"pi", 3.141},
+      {"happy", true},
+      {"name", "Niels"},
+      {"nothing", nullptr},
+      {"answer", {
+        {"everything", 42}
+      }},
+      {"list", {1, 0, 2}},
+      {"object", {
+        {"currency", "USD"},
+        {"value", 42.99}
+      }}
+    };
+    cout << j2.dump() << endl;
+#endif
+
+    RideShareTester tester;
+    tester.run_tests();
+    exit(0);
 }
 

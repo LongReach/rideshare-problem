@@ -58,7 +58,7 @@ namespace RideShare {
 									// lowest systemic unhappiness score
 
 		bool _last_request_made;
-		bool _first_update_made;
+		bool _new_request_made;
 	};
 
 }
