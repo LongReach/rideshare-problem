@@ -45,16 +45,20 @@ namespace RideShare {
 		// Puts a new passenger-in-transit into tracking.
 		void new_request(const char* name, int start_x, int start_y, int end_x, int end_y);
 
+		// Get statistics about the average trip made
 		void get_statistics(int* ret_num_trips, float* ret_avg_unhappiness, float* ret_avg_trip_time) {
 			*ret_num_trips = _num_trips_completed;
-			*ret_avg_unhappiness = _average_unhappiness;
-			*ret_avg_trip_time = _average_trip_time;
+			*ret_avg_unhappiness = (float) _average_unhappiness;
+			*ret_avg_trip_time = (float) _average_trip_time;
 		}
 
+		// Returns true if this passenger is in transit
 		bool is_passenger_active(const char* name);
 
 	private:
+		// Records a new passenger in the passenger roster, if they aren't already there
 		void make_passenger(const char* name);
+		// Gets data about specified passenger, or returns NULL
 		PassengerData* get_passenger_data(const char* name);
 		PassengerData* get_passenger_data(int id);
 
@@ -77,8 +81,8 @@ namespace RideShare {
 		bool _new_request_made;
 
 		int _num_trips_completed;
-		float _average_unhappiness;
-		float _average_trip_time;
+		double _average_unhappiness;
+		double _average_trip_time;
 	};
 
 }

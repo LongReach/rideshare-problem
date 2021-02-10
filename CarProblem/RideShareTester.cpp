@@ -37,6 +37,7 @@ void RideShareTester::run_tests() {
 
 	run_random_test("Random test 1", 15, 2, 500, false);
 	run_random_test("Random test 2", 10, 5, 500, false);
+	run_random_test("Random test 3", 10, 15, 500, false);
 }
 
 void RideShareTester::run_json_test(const char* json_file, bool should_fail) {

@@ -115,6 +115,10 @@ namespace RideShare {
 	}
 
 	void Dispatcher::make_passenger(const char* name) {
+		if (get_passenger_data(name)) {
+			// They already exist
+			return;
+		}
 		int new_id = _passenger_roster.size();
 		PassengerData* data = new PassengerData(name, new_id);
 		_passenger_roster.push_back(data);
