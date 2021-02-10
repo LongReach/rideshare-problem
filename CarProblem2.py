@@ -1,5 +1,11 @@
 import random
 import json
+import sys
+
+# Note:
+#
+# This code is just a prototype, a rough draft that I turned into the C++ implementation. I didn't bother much
+# with error-checking or other features that I'd put into production code.
 
 grid_dims=(10, 10)
 
@@ -309,6 +315,17 @@ while(True):
 
 print("Average unhappiness: {:.3f}".format(Passenger.average_unhappiness))
 print("Average trip time: {:.3f}".format(Passenger.average_time_elapsed))
+
+# Now, produce JSON file
+
 print()
-y = json.dumps(System.json_source_objects, indent=4)
-print(y)
+#y = json.dumps(System.json_source_objects, indent=4)
+#print(y)
+
+json_filename = "Rides.json"
+if len(sys.argv) > 1:
+    json_filename = sys.argv[1]
+
+with open(json_filename, "w") as json_file:
+    json_file.write(json.dumps(System.json_source_objects, indent=4))
+

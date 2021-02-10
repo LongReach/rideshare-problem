@@ -1,3 +1,11 @@
+/*
+* Ryan McMahon
+* 2/9/21
+* mcmahonryan@hotmail.com
+* Please read README.md
+* Other code samples at: github.com/LongReach
+*/
+
 // CarProblem.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
@@ -13,16 +21,8 @@ using namespace RideShare;
 int main()
 {
     Point::set_grid_dims(10, 10);
-    Point point(2, 3);
 
-#if 0
-    PassengerData data("monkey", 0);
-    Passenger passenger(&data);
-    Point start(0, 0);
-    Point end(9, 9);
-    passenger.activate(start, end);
-#endif
-
+    // Some early testing I did. Left it here to show my thought process.
 #if 0
     Dispatcher dispatcher;
 

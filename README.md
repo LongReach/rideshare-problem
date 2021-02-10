@@ -1,5 +1,46 @@
 # The Car Problem
 
+## Problem Description
+
+#### Autonomous Vehicle Routing Coding Challenge
+
+*Ride-hailing companies like Uber and Lyft have become ubiquitous means to get around cities. Efficient vehicle routing, or figuring out the fastest and most efficient way to direct vehicles to pick up and drop off multiple passengers at a time, has become a crucial component of their success.*
+
+*In the near future you are the proud owner of an autonomous vehicle! You want to let some friends use it whenever they want so you make an app to let them call the vehicle to come pick them up. In this problem you will develop a system to keep track of the state of your car and your friends.*
+
+*Here are some more constraints to help you code your solution:*
+
+*The city is a grid of perpendicular blocks. At initialization your code should take as inputs the number of streets in both the x and y directions (ex. x=10, y=10).*
+
+*The car can move in any direction exactly 1 block at a time. For our purposes, we only care about when the car is at a vertex of two intersecting streets, so continuing our example, a car can be at the intersection (0, 0) in the upper-left corner of our city, or (9, 9) in the bottom-right corner.*
+
+*There should be a function to advance time by one time-step (and hence the vehicle by one block in any direction). This function should accept a list of ride requests from your friends. These ride requests come in the form of a list of JSON elements like so:*
+
+```json5
+{ requests: [
+    {
+      'name': 'Elon',
+      'start': [3,5],
+      'end': [8,7]
+    },
+    {
+      'name': 'George',
+      'start': [1,2],
+      'end': [4,3]
+    }
+  ]
+}
+```
+
+*At each time step this list of requests can be an empty list (ex. []), or infinitely long. At each time step you should print out the current position of the vehicle and the names of all of the passengers currently in the vehicle, as well as anybody being dropped off or being picked up at this intersection. (We will assume your car can fit infinitely many people at a time.)*
+
+*Your goal is to schedule your car to get people where they want to go as fast as possible. Of course, you will likely have to make some trade-offs in the process. There is no right answer, just make sure you explain your decisions clearly in your write-up.*
+
+*Submission: Please return all of your code, as well as a write up of your solution, as well as any tests you have written in a zip file with your name in the title.*
+
+*Please code your solution in C++.*
+
+
 ## Process
 
 I decided to write my initial prototypes in Python, because it's easier to hack stuff together in that language than in C++.
@@ -55,6 +96,8 @@ I thought about the problem in terms of maximizing passenger happiness (or, real
 
 Similarly, once a passenger boards the car, they have a hope that the journey will take a certain amount of time, and they grow unhappier the more time they spend in the car beyond that amount. Fortunately, passengers who anticipated a longer trip are more tolerant of delay (in absolute terms) than passengers who expected a shorter trip. Naturally, a person going across town to the airport will add more cushion time to their plans than a person going to a nearby bar.
 
+In more formal terms, a passenger in transit is assigned an ideal pickup time and an ideal journey time. Both assume that the car takes the best possible route with no delays. Unhappiness is calculated by dividing elapsed time (or predicted elapsed time) by ideal time, then applying a bias factor (which assumes that a passenger never expects the actual time to match the ideal time). Without a bias, an unhappiness score for a journey that's double ideal time would be 2.0.
+
 The car chooses its next passenger to pick up or drop off by predicting how much unhappiness a given choice will bring to ALL of the active passengers (including those waiting for a ride). The goal is to minimize overall unhappiness within the system. Because of the predictive factor, looking forward to when and where the car will be after arriving at a certain destination, the planning system is discouraged from wandering too far away from nearby pick-up or drop-off points, especially those with a higher level of urgency.
 
 On each step, the Python program prints out a map of the city. It also prints out statistics on the systemic unhappiness that will be caused by selecting each active passenger as the next choice. The one with the lowest systemic happiness score is the best choice.
@@ -88,10 +131,123 @@ Passenger H: unhappiness prediction 2.25, system unhappiness 71.02
 Passenger A: unhappiness prediction 7.83, system unhappiness 81.87
 ```
 
-## Improvements
+#### Advantages
 
-There are countless ways to tweak this system.
+This solution performs reasonably well. It seems easy to add improvements such as:
 
-One idea is to add a factor that makes idealized passengers more patient (less quick to become unhappy) at times when there's more demand for the car.
+* Multiple cars
+* Limiting passengers per car
+* Better look-ahead, i.e. instead of seeing what systemic happiness will be if we look one pickup/dropoff ahead, we look two or three.
+* A factor to make idealized passengers more patient (less quick to become unhappy) at times when there's more demand for the car.
 
-Another idea is to give passengers a convenience score, so the car is encouraged to go to nearby points even when the happiness of that particular passenger isn't in immediate danger.
+## Third Pass
+
+Next, I coded my Second Pass solution in C++, reorganizing the class structure and adding more safety features, such as exception throwing and use of const.
+
+The parts of the framework are:
+
+Class | Purpose
+------|--------
+Point | a coordinate in city space
+Car   | the car
+PassengerData | represents a known passenger, e.g. George
+Passenger | a passenger currently in transit
+Dispatcher | implements actual heuristic, manages PassengerData, Passenger, Car objects
+RideShareTester | performs a series of simulations
+
+#### Test Designs
+
+Most of the tests are run by loading a JSON file, then triggering the specified requests (if any) at each time step of the simulation.
+
+Some JSONs contain malformed data and these tests are expected to throw exceptions. The JSONs can be found in the `\data` folder.
+
+There are also several randomly-generated tests. It's pretty straightforward, from looking at the code, how the tests work.
+
+#### JSON processing
+
+I used some Python libraries to generate sample JSONs. On the C++ side, I took advantage of this free library: https://github.com/nlohmann/json
+
+#### Running
+
+I wrote this code in Visual Studio 2019 and have provided the necessary solution and project files. Nothing special has to be done to get the JSON library to work, since it's just a header file. Some of the file system stuff relies on ISO C++ 17.
+
+I ran out of time and didn't try to make it work for Linux, but I'm sure I could, if requested. I may (or may not) have to modify how the handing of file paths in `RideShareTester.cpp/h` works
+
+#### Sample Output
+
+```Current passengers: Aloysius, Hildebrand
+Time step: 462, car at: (0,2)
+Current passengers: Aloysius, Hildebrand
+Time step: 463, car at: (0,1)
+Current passengers: Aloysius, Hildebrand
+Pickups: Ivanka
+Time step: 464, car at: (1,1)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 465, car at: (2,1)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 466, car at: (3,1)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 467, car at: (4,1)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Pickups: Georgia
+Time step: 468, car at: (3,1)
+Current passengers: Aloysius, Hildebrand, Georgia, Ivanka
+Time step: 469, car at: (2,1)
+Current passengers: Aloysius, Hildebrand, Georgia, Ivanka
+Time step: 470, car at: (1,1)
+Current passengers: Aloysius, Hildebrand, Georgia, Ivanka
+Time step: 471, car at: (1,2)
+Current passengers: Aloysius, Hildebrand, Georgia, Ivanka
+Time step: 472, car at: (1,3)
+Current passengers: Aloysius, Hildebrand, Georgia, Ivanka
+Dropoffs: Georgia
+Time step: 473, car at: (2,3)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 474, car at: (3,3)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 475, car at: (4,3)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 476, car at: (5,3)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 477, car at: (6,3)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 478, car at: (7,3)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Pickups: Dumbledore
+Time step: 479, car at: (8,3)
+Current passengers: Aloysius, Hildebrand, Ivanka, Dumbledore
+Dropoffs: Dumbledore
+Time step: 480, car at: (8,4)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 481, car at: (8,5)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Time step: 482, car at: (8,6)
+Current passengers: Aloysius, Hildebrand, Ivanka
+Dropoffs: Aloysius
+```
+
+... snipped ...
+
+```
+JSON test complete for RideRequests1.json
+Total trips: 74, average unhappiness: 1.202728, average trip time: 35.108112
+----------------------------
+Test RideRequests1.json succeeded as expected.
+Info: None
+
+Running test: RideRequestsDoubleRequest.json
+----------------------------
+JSON path is: "D:\\CodingProjects\\CPP\\CarProblem\\CarProblem\\data\\RideRequestsDoubleRequest.json"
+Time step: 0, car at: (0,0)
+Current passengers: None
+Time step: 1, car at: (1,0)
+Current passengers: None
+Time step: 2, car at: (2,0)
+Current passengers: None
+Pickups: Betty
+----------------------------
+Test RideRequestsDoubleRequest.json failed as expected.
+Info: Active passenger 2 already exists
+```
+
+... snipped ...

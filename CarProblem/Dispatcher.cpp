@@ -1,3 +1,11 @@
+/*
+* Ryan McMahon
+* 2/9/21
+* mcmahonryan@hotmail.com
+* Please read README.md
+* Other code samples at: github.com/LongReach
+*/
+
 #include "Dispatcher.h"
 
 namespace RideShare {
@@ -6,6 +14,9 @@ namespace RideShare {
 		_last_request_made = false;
 		_new_request_made = false;
 		_next_passenger = NULL;
+		_average_unhappiness = 0.0f;
+		_average_trip_time = 0.0f;
+		_num_trips_completed = 0;
 	}
 
 	void Dispatcher::update(vector<PassengerData*>& ret_passengers_picked_up, vector<PassengerData*>& ret_passengers_dropped_off) {
@@ -35,6 +46,10 @@ namespace RideShare {
 			if (p->_dropped_off) {
 				ret_passengers_dropped_off.push_back(p->_data);
 				_active_passenger_map.erase(p->_data->_id);
+				// Update global statistics
+				_average_unhappiness = (_average_unhappiness * (float) _num_trips_completed + p->get_unhappiness_score()) / ((float) (_num_trips_completed + 1));
+				_average_trip_time = (_average_trip_time * (float) _num_trips_completed + p->_time_elapsed) / ((float)(_num_trips_completed + 1));
+				_num_trips_completed++;
 				delete p;
 			}
 			else {
@@ -89,6 +104,15 @@ namespace RideShare {
 		activate_passenger(data->_id, start, end);
 	}
 
+	bool Dispatcher::is_passenger_active(const char* name) {
+		PassengerData* data = get_passenger_data(name);
+		if (data) {
+			if (_active_passenger_map.find(data->_id) != _active_passenger_map.end()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	void Dispatcher::make_passenger(const char* name) {
 		int new_id = _passenger_roster.size();

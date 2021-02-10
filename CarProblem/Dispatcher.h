@@ -1,3 +1,11 @@
+/*
+* Ryan McMahon
+* 2/9/21
+* mcmahonryan@hotmail.com
+* Please read README.md
+* Other code samples at: github.com/LongReach
+*/
+
 #pragma once
 #include <string>
 #include <vector>
@@ -37,6 +45,14 @@ namespace RideShare {
 		// Puts a new passenger-in-transit into tracking.
 		void new_request(const char* name, int start_x, int start_y, int end_x, int end_y);
 
+		void get_statistics(int* ret_num_trips, float* ret_avg_unhappiness, float* ret_avg_trip_time) {
+			*ret_num_trips = _num_trips_completed;
+			*ret_avg_unhappiness = _average_unhappiness;
+			*ret_avg_trip_time = _average_trip_time;
+		}
+
+		bool is_passenger_active(const char* name);
+
 	private:
 		void make_passenger(const char* name);
 		PassengerData* get_passenger_data(const char* name);
@@ -59,6 +75,10 @@ namespace RideShare {
 
 		bool _last_request_made;
 		bool _new_request_made;
+
+		int _num_trips_completed;
+		float _average_unhappiness;
+		float _average_trip_time;
 	};
 
 }
