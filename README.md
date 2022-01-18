@@ -1,4 +1,4 @@
-# Ride-Share Car Problem
+# Rideshare Car Problem
 
 ![](images/RideShare.jpg)
 
