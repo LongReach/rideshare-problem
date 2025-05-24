@@ -2,6 +2,10 @@
 
 ![](images/RideShare.jpg)
 
+## 2025 Note
+
+To potential employers: I created this back in 2020, to help me in my job search. Hence the focus on explaining my thought process. My Python skills have improved a great deal since then.
+
 ## Problem Description
 
 #### Autonomous Vehicle Routing
