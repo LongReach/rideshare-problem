@@ -1,22 +1,16 @@
-/*
-* Ryan McMahon
-* 2/9/21
-* mcmahonryan@hotmail.com
-* Please read README.md
-* Other code samples at: github.com/LongReach
-*/
-
-// CarProblem.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
+/**
+ * @file car_problem.cpp
+ * @author Ryan McMahon (mcmahonryan@hotmail.com)
+ * @brief Program entry point. Runs the ride-share test suite.
+ */
 #include <iostream>
-#include "Point.h"
-#include "Passenger.h"
-#include "Dispatcher.h"
-#include "RideShareTester.h"
+#include "point.h"
+#include "passenger.h"
+#include "dispatcher.h"
+#include "ride_share_tester.h"
 
 using namespace std;
-using namespace RideShare;
+using namespace ride_share;
 
 int main()
 {
@@ -77,4 +71,3 @@ int main()
     tester.run_tests();
     exit(0);
 }
-

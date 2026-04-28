@@ -1,20 +1,16 @@
-/*
-* Ryan McMahon
-* 2/9/21
-* mcmahonryan@hotmail.com
-* Please read README.md
-* Other code samples at: github.com/LongReach
-*/
-
+/**
+ * @file ride_share_tester.cpp
+ * @author Ryan McMahon (mcmahonryan@hotmail.com)
+ */
 #include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <stdlib.h>
 #include <time.h>
-#include "Dispatcher.h"
-#include "RideShareTester.h"
+#include "dispatcher.h"
+#include "ride_share_tester.h"
 
-using namespace RideShare;
+using namespace ride_share;
 using namespace std;
 // Note: On Visual Studio, this only works if the language standard is ISO C++ 17
 namespace fs = std::filesystem;
@@ -82,10 +78,9 @@ void RideShareTester::load_and_run_json(const char* json_file) {
 	Dispatcher dispatcher;
 	int t = 0;
 	json::iterator it = j.begin();
-	// This is the main update loop for advancing through the scenario
+	// Main update loop for advancing through the scenario.
 	while (!dispatcher.is_done()) {
 
-		// Are there requests for this time step to send? If so, extract from JSON
 		if (it != j.end()) {
 			if (!it->contains("requests")) {
 				string info = "Missing requests object in JSON";
@@ -94,7 +89,6 @@ void RideShareTester::load_and_run_json(const char* json_file) {
 			}
 
 			json& requests_json = *(it->find("requests"));
-			// Iterate through all requests (if any)
 			for (json::iterator request_it = requests_json.begin(); request_it != requests_json.end(); request_it++) {
 				string name;
 				int start_x, start_y, end_x, end_y;
@@ -108,7 +102,6 @@ void RideShareTester::load_and_run_json(const char* json_file) {
 			dispatcher.set_last_request_made();
 		}
 
-		// Update the simulation
 		vector<PassengerData*> in_car;
 		dispatcher.get_passengers_in_car(in_car);
 		vector<PassengerData*> pickups;
@@ -119,10 +112,10 @@ void RideShareTester::load_and_run_json(const char* json_file) {
 
 		std::cout << "Current passengers: " << get_passenger_list_str(in_car, "None") << endl;
 		if (pickups.size() > 0) {
-			std::cout << "Pickups: " << get_passenger_list_str(pickups, NULL) << endl;
+			std::cout << "Pickups: " << get_passenger_list_str(pickups, nullptr) << endl;
 		}
 		if (dropoffs.size() > 0) {
-			std::cout << "Dropoffs: " << get_passenger_list_str(dropoffs, NULL) << endl;
+			std::cout << "Dropoffs: " << get_passenger_list_str(dropoffs, nullptr) << endl;
 		}
 
 		t++;
@@ -136,7 +129,6 @@ void RideShareTester::load_and_run_json(const char* json_file) {
 }
 
 void RideShareTester::load_json_file(const char* filename, json& json_obj) {
-	// TODO: this might have to be written differently to also work on Linux
 	fs::path current_path = fs::current_path();
 	fs::path json_path(filename);
 	fs::path full_path = current_path;
@@ -225,23 +217,21 @@ string RideShareTester::get_passenger_list_str(vector<PassengerData*>& the_list,
 }
 
 void RideShareTester::run_random_test(const char* test_name, int city_size, int request_odds, int num_requests, bool verbose) {
-	
-	srand(time(NULL)); // initialize random number seed
+
+	srand(time(nullptr));
 
 	const char* names[] = { "Andy", "Betsy", "Charlie", "Danielle", "Emilio", "Francis", "George", "Heidi", "Igor", "Jamie" };
 	int num_names = 10;
-	
+
 	Point::set_grid_dims(city_size, city_size);
 	Dispatcher dispatcher;
 	int t = 0;
-	// This is the main update loop for advancing through the scenario
+	// Main update loop for advancing through the scenario.
 	while (!dispatcher.is_done()) {
 
-		// Should we send any requests?
 		if (num_requests > 0) {
 			int n = rand() % num_names;
 			if (!dispatcher.is_passenger_active(names[n])) {
-				// This passenger can request a ride, so see if they should
 				int dice_roll = rand() % 100;
 				if (dice_roll < request_odds) {
 					int start_x = rand() % city_size;
@@ -259,7 +249,6 @@ void RideShareTester::run_random_test(const char* test_name, int city_size, int 
 			dispatcher.set_last_request_made();
 		}
 
-		// Update the simulation
 		vector<PassengerData*> in_car;
 		dispatcher.get_passengers_in_car(in_car);
 		vector<PassengerData*> pickups;
@@ -271,10 +260,10 @@ void RideShareTester::run_random_test(const char* test_name, int city_size, int 
 
 			std::cout << "Current passengers: " << get_passenger_list_str(in_car, "None") << endl;
 			if (pickups.size() > 0) {
-				std::cout << "Pickups: " << get_passenger_list_str(pickups, NULL) << endl;
+				std::cout << "Pickups: " << get_passenger_list_str(pickups, nullptr) << endl;
 			}
 			if (dropoffs.size() > 0) {
-				std::cout << "Dropoffs: " << get_passenger_list_str(dropoffs, NULL) << endl;
+				std::cout << "Dropoffs: " << get_passenger_list_str(dropoffs, nullptr) << endl;
 			}
 		}
 
