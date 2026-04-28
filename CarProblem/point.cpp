@@ -1,65 +1,68 @@
+/**
+ * @file point.cpp
+ * @author Ryan McMahon (mcmahonryan@hotmail.com)
+ */
 #include <cmath>
 #include <string>
-#include "Point.h"
+#include "point.h"
 
-namespace RideShare {
+namespace ride_share {
 
 	using namespace std;
 
-	Point Point::_grid_dims;
+	Point Point::grid_dims_;
 
 	Point::Point() {
-		_x = 0;
-		_y = 0;
+		x_ = 0;
+		y_ = 0;
 	}
 
 	Point::Point(int x, int y) {
-		_x = x;
-		_y = y;
+		x_ = x;
+		y_ = y;
 	}
 
 	Point::Point(const Point& other)
 	{
-		_x = other._x;
-		_y = other._y;
+		x_ = other.x_;
+		y_ = other.y_;
 	}
 
 	string Point::get_string() const {
-		string result = "(" + std::to_string(_x) + "," + std::to_string(_y) + ")";
+		string result = "(" + std::to_string(x_) + "," + std::to_string(y_) + ")";
 		return result;
 	}
 
 	bool Point::operator==(const Point& other) const {
-		return (_x == other._x && _y == other._y);
+		return (x_ == other.x_ && y_ == other.y_);
 	}
 
 	void Point::operator=(const Point& other) {
-		_x = other._x;
-		_y = other._y;
+		x_ = other.x_;
+		y_ = other.y_;
 	}
 
 	Point Point::operator+(const Point& other) const {
-		Point point(this->_x + other._x, this->_y + other._y);
+		Point point(this->x_ + other.x_, this->y_ + other.y_);
 		return point;
 	}
 
 	Point Point::operator-(const Point& other) const {
-		Point point(this->_x - other._x, this->_y - other._y);
+		Point point(this->x_ - other.x_, this->y_ - other.y_);
 		return point;
 	}
 
 	void Point::set_grid_dims(int x, int y) {
-		_grid_dims.set(x, y);
+		grid_dims_.set(x, y);
 	}
 
 	Point Point::get_grid_dims() {
-		return _grid_dims;
+		return grid_dims_;
 	}
-
 
 	int Point::get_dist(const Point& pt1, const Point& pt2) {
 		Point delta = pt2 - pt1;
 		return abs(delta.x()) + abs(delta.y());
 	}
 
-}
+}  // namespace ride_share
